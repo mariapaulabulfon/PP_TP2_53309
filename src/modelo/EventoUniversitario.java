@@ -156,21 +156,12 @@ public class EventoUniversitario implements Serializable {
         }
     }
 
-    // Persistir evento mediante serialización de objetos (en un archivo .dat en disco)
+    // Persistir evento mediante serialización
     public boolean persistirEvento() throws IOException {
         String nombreArchivo = "evento_" + this.id + ".dat";
-        FileOutputStream ofos = null;
-        ObjectOutputStream oos = null;
-        try {
-            ofos = new FileOutputStream(nombreArchivo);
-            oos = new ObjectOutputStream(ofos);
+        // try-with-resources: se encadena y se cierra solo
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nombreArchivo))) {
             oos.writeObject(this);
-        } finally {
-            if (oos != null) {
-                oos.close();
-            } else if (ofos != null) {
-                ofos.close();
-            }
         }
         return true;
     }
@@ -178,21 +169,9 @@ public class EventoUniversitario implements Serializable {
     // Recuperar evento deserializando desde archivo
     public static EventoUniversitario recuperarEvento(String id) throws IOException, ClassNotFoundException {
         String nombreArchivo = "evento_" + id + ".dat";
-        EventoUniversitario eventoRecuperado = null;
-        FileInputStream ofis = null;
-        ObjectInputStream ois = null;
-        try {
-            ofis = new FileInputStream(nombreArchivo);
-            ois = new ObjectInputStream(ofis);
-            eventoRecuperado = (EventoUniversitario) ois.readObject();
-        } finally {
-            if (ois != null) {
-                ois.close();
-            } else if (ofis != null) {
-                ofis.close();
-            }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nombreArchivo))) {
+            return (EventoUniversitario) ois.readObject();
         }
-        return eventoRecuperado;
     }
 
     // Metodo generico acotado para filtrar actividades por tipo de clase
